@@ -81,3 +81,71 @@ export function person(ctx, r, { dir = 1, frame = 0 } = {}) {
   }
   ctx.restore();
 }
+
+// Helper bot: boxy chibi with a visor, antenna and chest light. Same screen-space frame as `person`.
+const ROBOT_BODY = ['#c9d3da', '#e1b04a', '#7fb2c9', '#d0705c', '#8fc08a'];
+const ROBOT_GLOW = ['#6fe3ff', '#ffd45e', '#8dff9a', '#ff8a6b'];
+export function robot(ctx, r, { dir = 1, frame = 0 } = {}) {
+  const body = r.pick(ROBOT_BODY), glow = r.pick(ROBOT_GLOW), joint = '#4a5058', dark = '#2d3136';
+  const front = dir < 2;
+  const sx = dir === 0 || dir === 3 ? 1 : -1;
+  const swing = frame === 0 ? 0 : frame === 1 ? 1.8 : -1.8;
+  const bob = frame === 0 ? 0 : -0.6;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(45,55,30,.2)';
+  ctx.beginPath();
+  ctx.ellipse(0, 0.5, 6.5, 2.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const rect = (x, y, w, h, c, rad = 0.8) => {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, rad);
+    ctx.fillStyle = c;
+    ctx.fill();
+  };
+  const dot = (x, y, R, c) => { ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill(); };
+
+  // legs: short pistons with flat feet (back leg first)
+  const legY = -5.6 + bob;
+  rect(-2.6 - swing * sx * 0.5, legY, 2.4, 5, joint);
+  rect(0.2 + swing * sx * 0.5, legY, 2.4, 5, shade(joint, 0.1));
+  rect(-3.2 - swing * sx * 0.5, -1.4 + Math.abs(swing) * 0.3, 3.4, 1.7, dark, 0.6);
+  rect(-0.2 + swing * sx * 0.5, -1.4 + Math.abs(swing) * 0.3, 3.4, 1.7, dark, 0.6);
+
+  // arms behind torso when walking away
+  const armY = -12.6 + bob;
+  const arm = (x, c) => { rect(x, armY, 1.9, 5.2, c, 0.9); dot(x + 0.95, armY + 5.4, 1.15, joint); };
+  if (!front) { arm(-5.3 - swing * 0.4, shade(body, -0.1)); arm(3.4 + swing * 0.4, shade(body, -0.1)); }
+
+  // torso
+  rect(-4, -13.4 + bob, 8, 8, body, 1.8);
+  rect(-4, -9 + bob, 8, 3.6, shade(body, -0.09), 1.4);
+  if (front) {
+    rect(-2.4, -11.8 + bob, 4.8, 3.2, dark, 0.9);          // chest panel
+    dot(0, -10.2 + bob, 1.05, glow);
+    dot(0, -10.2 + bob, 1.9, glow + '40');
+    arm(-5.5 + swing * 0.4, shade(body, -0.04));
+    arm(3.6 - swing * 0.4, shade(body, -0.04));
+  } else {
+    rect(-2.6, -11.6 + bob, 5.2, 4.2, shade(body, -0.16), 0.9);   // back vent
+    for (let i = 0; i < 3; i++) rect(-2, -11 + i * 1.3 + bob, 4, 0.5, dark, 0.2);
+  }
+
+  // head: wide rounded box, antenna with a glowing tip
+  const hx = sx * 0.4, hy = -19 + bob;
+  rect(hx - 0.35, hy - 8.6, 0.8, 3, joint, 0.3);
+  dot(hx + 0.05, hy - 8.8, 1.2, glow);
+  rect(hx - 4.8, hy - 4.6, 9.6, 8.8, body, 2.4);
+  rect(hx - 5.5, hy - 1.4, 1, 2.8, joint, 0.4);                  // ear bolts
+  rect(hx + 4.5, hy - 1.4, 1, 2.8, joint, 0.4);
+  if (front) {
+    rect(hx - 3.8 + sx * 0.5, hy - 2.4, 7.6, 4.2, dark, 1.8);    // visor
+    dot(hx + sx * 0.5 - 1.7, hy - 0.3, 0.95, glow);
+    dot(hx + sx * 0.5 + 1.7, hy - 0.3, 0.95, glow);
+  } else {
+    rect(hx - 3.4, hy - 3.4, 6.8, 1, shade(body, -0.14), 0.4);
+    rect(hx - 3.4, hy - 1.4, 6.8, 1, shade(body, -0.14), 0.4);
+  }
+  ctx.restore();
+}

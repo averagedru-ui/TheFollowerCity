@@ -9,7 +9,7 @@ import * as V2 from './assets/vehicles2.js';
 import * as M from './assets/more.js';
 import * as V3 from './assets/vehicles3.js';
 import * as HD from './assets/holiday.js';
-import { person } from './assets/people.js';
+import { person, robot } from './assets/people.js';
 
 // scale = preview zoom, oy = ground anchor (px from top), w/h = card size,
 // dirs = draw all 4 headings, anim = has walk frames
@@ -259,6 +259,9 @@ export const ASSETS = [
   a('People', 'Villager 2', person, { scale: 4.2, oy: 120, dirs: true, anim: true, seedOffset: 7 }),
   a('People', 'Villager 3', person, { scale: 4.2, oy: 120, dirs: true, anim: true, seedOffset: 19 }),
   a('People', 'Villager 4', person, { scale: 4.2, oy: 120, dirs: true, anim: true, seedOffset: 31 }),
+  a('People', 'Robot', robot, { scale: 4.2, oy: 120, dirs: true, anim: true }),
+  a('People', 'Robot 2', robot, { scale: 4.2, oy: 120, dirs: true, anim: true, seedOffset: 7 }),
+  a('People', 'Robot 3', robot, { scale: 4.2, oy: 120, dirs: true, anim: true, seedOffset: 19 }),
 ];
 
 export const CATEGORIES = [...new Set(ASSETS.map((x) => x.cat))];
